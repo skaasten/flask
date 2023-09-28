@@ -1,5 +1,5 @@
 # This config was automatically generated from your source code
-# Stacks detected: deps:python:.,file:setup.py:.,test:tox:.
+# Stacks detected: deps:python:.,test:tox:.
 version: 2.1
 orbs:
   python: circleci/python@2
@@ -10,29 +10,14 @@ jobs:
       - image: cimg/python:3.8-node
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: pip-dist
+      - python/install-packages
       - python/install-packages:
           args: tox
-          pkg-manager: pip-dist
       - run:
           name: Run tests
           command: tox -e py38
       - store_test_results:
           path: junit.xml
-  build-package:
-    # build python package
-    docker:
-      - image: cimg/python:3.8-node
-    steps:
-      - checkout
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      - python/dist
-      - store_artifacts:
-          path: dist
-          destination: ~/artifacts
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
@@ -46,9 +31,6 @@ workflows:
   build-and-test:
     jobs:
       - test-python
-      - build-package:
-          requires:
-            - test-python
     # - deploy:
     #     requires:
-    #       - build-package
+    #       - test-python
